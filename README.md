@@ -73,7 +73,7 @@ Retrieve Context easily
 public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @MContext Context context;
+    @RContext Context context;
 }
 ```
 
@@ -103,6 +103,8 @@ public class MyTest {
     }
 }
 ```
+
+Note that the injected view is a spy !
 
 # Download
 
