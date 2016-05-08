@@ -1,6 +1,7 @@
 package com.github.florent37.androidunittest.activity;
 
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 
@@ -11,6 +12,14 @@ public class Controller {
     private AndroidUnitTest androidUnitTest;
     public Controller(AndroidUnitTest androidUnitTest) {
         this.androidUnitTest = androidUnitTest;
+    }
+
+    @Nullable
+    public FragmentActivity get(){
+        if(androidUnitTest.getActivityController() != null) {
+            return (FragmentActivity) androidUnitTest.getActivityController().get();
+        }
+        return null;
     }
 
     @Nullable

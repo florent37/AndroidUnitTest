@@ -1,5 +1,7 @@
 # Android Unit Test
 
+Elegant Unit test for Android !
+
 #Usage
 
 ```java
@@ -73,7 +75,6 @@ public class MyTest {
 }
 ```
 
-
 Note that the injected activity is a spy !
 
 ```java
@@ -124,8 +125,10 @@ Note that the injected view is a spy !
 
 # Download
 
+ [ ![Download](https://api.bintray.com/packages/florent37/maven/AndroidUnitTest/images/download.svg) ](https://bintray.com/florent37/maven/AndroidUnitTest/_latestVersion)
+
 ```java
-testCompile 'com.github.florent37.androidunittest:androidunittest:(last version)' //not yet available
+testCompile 'com.github.florent37:androidunittest:(last version)'
 
 testCompile 'junit:junit:4.12'
 testCompile 'org.mockito:mockito-core:1.10.19'
