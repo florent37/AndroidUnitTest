@@ -1,6 +1,7 @@
 package com.github.florent37.androidunittest;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -9,7 +10,6 @@ import com.github.florent37.androidunittest.annotations.MContext;
 import com.github.florent37.androidunittest.annotations.MFragment;
 
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.FieldReader;
 import org.mockito.internal.util.reflection.FieldSetter;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
@@ -26,6 +26,7 @@ public class RobolectricAnnotations {
     Field activityField;
     Field fragmentField;
     Field contextField;
+
     public RobolectricAnnotations(AndroidUnitTest androidUnitTest) {
         this.androidUnitTest = androidUnitTest;
     }
@@ -71,17 +72,20 @@ public class RobolectricAnnotations {
             }
 
             fragment = Mockito.spy(fragment);
+            new FieldSetter(target, this.fragmentField).set(fragment);
 
-            new FieldSetter(target, this.activityField).set(fragment);
             if (this.activityField == null) {
                 createActivity(FragmentActivity.class, true);
             }
 
-            FragmentActivity fragmentActivity = (FragmentActivity) new FieldReader(target, this.activityField).read();
-            fragmentActivity.getSupportFragmentManager().beginTransaction()
+            getActivity().getSupportFragmentManager().beginTransaction()
                 .add(fragment, fragment.getClass().toString())
                 .commit();
         }
+    }
+
+    private FragmentActivity getActivity(){
+        return (FragmentActivity) androidUnitTest.getActivityController().get();
     }
 
     private void execute() {
@@ -106,11 +110,14 @@ public class RobolectricAnnotations {
 
     private void createActivity(Class activityClass, boolean create) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        if(create)
+        if (create) {
             activityController.create();
+        }
         androidUnitTest.setActivityController(activityController);
-        FragmentActivity activity = (FragmentActivity) activityController.get();
-        activity = Mockito.spy(activity);
-        new FieldSetter(target, this.activityField).set(activity);
+        FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
+        fragmentActivity = Mockito.spy(fragmentActivity);
+        if (this.activityField != null) {
+            new FieldSetter(target, this.activityField).set(fragmentActivity);
+        }
     }
 }
