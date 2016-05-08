@@ -7,8 +7,8 @@
 public class MainActivityTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @MContext Context context;
     @MActivity MainActivity activity;
+    @Mock User user;
 
     @Test
     public void testOnResume() throws Exception {
@@ -21,6 +21,8 @@ public class MainActivityTest {
 }
 ```
 
+## TestRunner
+
 Simplify Robolectric Integration
 
 ```java
@@ -28,6 +30,19 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
     public CustomTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass, BuildConfig.FLAVOR, BuildConfig.BUILD_TYPE, BuildConfig.APPLICATION_ID, TestMyApplication.class);
     }
+}
+```
+
+## Context
+
+Retrieve Context easily
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @MContext Context context;
 }
 ```
 
