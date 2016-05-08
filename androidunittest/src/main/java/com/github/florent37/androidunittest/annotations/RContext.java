@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
  * Created by florentchampigny on 07/05/2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MContext {
+public @interface RContext {
 }

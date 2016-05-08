@@ -22,10 +22,10 @@ public class AndroidUnitTest implements MethodRule {
 
     Controller controller;
     @Nullable  ActivityController activityController;
-    private RobolectricAnnotations robolectricAnnotations;
+    private AndroidUnitTestAnnotations androidUnitTestAnnotations;
 
     protected AndroidUnitTest() {
-        robolectricAnnotations = new RobolectricAnnotations(AndroidUnitTest.this);
+        androidUnitTestAnnotations = new AndroidUnitTestAnnotations(AndroidUnitTest.this);
         controller = new Controller(this);
     }
 
@@ -35,7 +35,7 @@ public class AndroidUnitTest implements MethodRule {
             @Override
             public void evaluate() throws Throwable {
                 MockitoAnnotations.initMocks(target);
-                robolectricAnnotations.init(target);
+                androidUnitTestAnnotations.init(target);
                 base.evaluate();
                 Mockito.validateMockitoUsage();
             }
@@ -47,8 +47,8 @@ public class AndroidUnitTest implements MethodRule {
         return activityController;
     }
 
-    public RobolectricAnnotations getRobolectricAnnotations() {
-        return robolectricAnnotations;
+    public AndroidUnitTestAnnotations getAndroidUnitTestAnnotations() {
+        return androidUnitTestAnnotations;
     }
 
     public void setActivityController(@Nullable ActivityController activityController) {

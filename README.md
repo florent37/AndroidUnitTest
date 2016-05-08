@@ -7,16 +7,19 @@
 public class MainActivityTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @MActivity MainActivity activity;
+    @RActivity MainActivity activity;
     @Mock User user;
 
     @Test
-    public void testOnResume() throws Exception {
-        assertThat(activity.resumed).isFalse();
-
-        androidUnitTest.activity().resume();
-
-        assertThat(activity.resumed).isTrue();
+    public void testDisplayUser() throws Exception {
+        // Given
+        given(user.getName()).willReturn("florent");
+        
+        // When
+        activity.display(user);
+        
+        // Then
+        assertThat(activity.textView.getText()).isEqualTo("florent");
     }
 }
 ```
@@ -33,6 +36,34 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 }
 ```
 
+## Activity Initial State
+
+Retrieve Context easily (by default activity is created())
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RActivity(
+        created = true / false,
+        started = true / false,
+        resumed = true / false,
+        paused = true / false,
+        stoped = true / false,
+        destroyed = true / false
+        )
+    MainActivity activity;
+
+}
+```
+
+Note that the injected activity is a spy !
+
+```java
+verify(activity, times(2)).someMethod(anyInt());
+```
+
 ## Context
 
 Retrieve Context easily
@@ -44,6 +75,43 @@ public class MyTest {
 
     @MContext Context context;
 }
+```
+
+Note that the injected context is a spy !
+
+```java
+verify(context, times(2)).someMethod(anyInt());
+```
+
+## View
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RView View view;
+    
+    @Test
+    public void testDisplayUser() throws Exception {
+        // Given
+        given(user.getName()).willReturn("florent");
+        // When
+        mainView.display(user);
+        // Then
+        verify(mainView).displayText("florent");
+    }
+}
+```
+
+# Download
+
+```java
+testCompile 'com.github.florent37.androidunittest:androidunittest:(last version)' //not yet available
+
+testCompile 'junit:junit:4.12'
+testCompile 'org.mockito:mockito-core:1.10.19'
+testCompile 'org.robolectric:robolectric:3.0'
 ```
 
 #Credits

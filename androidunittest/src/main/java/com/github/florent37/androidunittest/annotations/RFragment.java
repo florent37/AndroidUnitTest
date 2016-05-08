@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
  * Created by florentchampigny on 07/05/2016.
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MActivity {
-    boolean create() default true;
+public @interface RFragment {
+    boolean attached() default true;
+    String tag() default "";
 }

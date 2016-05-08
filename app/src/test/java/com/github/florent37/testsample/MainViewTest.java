@@ -1,7 +1,11 @@
 package com.github.florent37.testsample;
 
+import android.content.Context;
+
 import com.github.florent37.androidunittest.AndroidUnitTest;
-import com.github.florent37.androidunittest.annotations.RActivity;
+import com.github.florent37.androidunittest.annotations.RContext;
+import com.github.florent37.androidunittest.annotations.RFragment;
+import com.github.florent37.androidunittest.annotations.RView;
 import com.github.florent37.testsample.model.User;
 
 import org.junit.Rule;
@@ -11,23 +15,29 @@ import org.mockito.Mock;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @RunWith(CustomTestRunner.class)
-public class MainActivityTest {
+public class MainViewTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RActivity MainActivity activity;
-
+    @RView MainView mainView;
     @Mock User user;
+
+    @Test
+    public void testAnnotations() throws Exception {
+        assertThat(mainView).isNotNull();
+    }
 
     @Test
     public void testDisplayUser() throws Exception {
         // Given
         given(user.getName()).willReturn("florent");
         // When
-        activity.display(user);
+        mainView.display(user);
         // Then
-        assertThat(activity.textView.getText()).isEqualTo("florent");
+        verify(mainView).displayText("florent");
     }
+
 
 }

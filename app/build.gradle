@@ -21,8 +21,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(":androidunittest")
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:support-annotations:23.3.0'
 
+    testCompile project(":androidunittest")
+    testCompile 'com.google.truth:truth:0.28'
 }

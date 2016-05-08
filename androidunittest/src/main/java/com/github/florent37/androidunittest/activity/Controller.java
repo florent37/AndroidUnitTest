@@ -4,8 +4,6 @@ import android.support.annotation.Nullable;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 
-import org.robolectric.util.ActivityController;
-
 /**
  * Created by florentchampigny on 08/05/2016.
  */
@@ -19,7 +17,7 @@ public class Controller {
     public Controller resume(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().resume();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
@@ -28,7 +26,7 @@ public class Controller {
     public Controller create(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().create();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
@@ -37,7 +35,7 @@ public class Controller {
     public Controller start(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().start();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
@@ -46,7 +44,7 @@ public class Controller {
     public Controller pause(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().pause();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
@@ -55,7 +53,7 @@ public class Controller {
     public Controller stop(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().stop();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
@@ -64,7 +62,7 @@ public class Controller {
     public Controller destroy(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().destroy();
-            androidUnitTest.getRobolectricAnnotations().updateActivity();
+            androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
         }
         return this;
     }
