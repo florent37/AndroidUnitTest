@@ -25,11 +25,6 @@ public class MainViewTest {
     @Mock User user;
 
     @Test
-    public void testAnnotations() throws Exception {
-        assertThat(mainView).isNotNull();
-    }
-
-    @Test
     public void testDisplayUser() throws Exception {
         // Given
         given(user.getName()).willReturn("florent");

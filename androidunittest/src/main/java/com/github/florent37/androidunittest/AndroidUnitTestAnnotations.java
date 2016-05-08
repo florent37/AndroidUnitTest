@@ -149,23 +149,25 @@ public class AndroidUnitTestAnnotations {
 
     private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        if (activityAnnotation.created()) {
-            activityController.create();
-        }
-        if (activityAnnotation.started()) {
-            activityController.start();
-        }
-        if (activityAnnotation.resumed()) {
-            activityController.resume();
-        }
-        if (activityAnnotation.paused()) {
-            activityController.pause();
-        }
-        if (activityAnnotation.stoped()) {
-            activityController.stop();
-        }
-        if (activityAnnotation.destroyed()) {
-            activityController.destroy();
+        if(activityAnnotation != null) {
+            if (activityAnnotation.created()) {
+                activityController.create();
+            }
+            if (activityAnnotation.started()) {
+                activityController.start();
+            }
+            if (activityAnnotation.resumed()) {
+                activityController.resume();
+            }
+            if (activityAnnotation.paused()) {
+                activityController.pause();
+            }
+            if (activityAnnotation.stoped()) {
+                activityController.stop();
+            }
+            if (activityAnnotation.destroyed()) {
+                activityController.destroy();
+            }
         }
         androidUnitTest.setActivityController(activityController);
         FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
