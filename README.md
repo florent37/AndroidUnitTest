@@ -1,6 +1,7 @@
 # Android Unit Test
 
-Elegant Unit test for Android !
+Elegant Unit test for Android ! 
+Use annotations to inject Context, Activities, Fragments and Views into your tests
 
 #Usage
 
