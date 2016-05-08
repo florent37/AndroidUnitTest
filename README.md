@@ -36,7 +36,7 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 }
 ```
 
-## Activity Initial State
+## Activity State
 
 Retrieve Context easily (by default activity is created())
 
@@ -57,6 +57,22 @@ public class MyTest {
 
 }
 ```
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RActivity MainActivity activity;
+    
+    @Test
+    public void testMyFunction(){
+        androidUnitTest.activity().resume();
+    }
+
+}
+```
+
 
 Note that the injected activity is a spy !
 
