@@ -133,6 +133,7 @@ public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
     @RFragment MyFragment myFragment;
+    @Mock User user;
     
     @Test
     public void testDisplayUser() throws Exception {
@@ -152,7 +153,7 @@ public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
     @RFragment(
-        attached = true/false,
+        attached = true / false,
         tag = "fragmentTag"
     )
     MyFragment myFragment;
