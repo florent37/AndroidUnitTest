@@ -1,6 +1,7 @@
 # Android Unit Test
 
-Elegant Unit test for Android ! 
+Save time & clear your unit tests on Android ! 
+
 Use annotations to inject Context, Activities, Fragments and Views into your tests
 
 #Usage
@@ -41,7 +42,7 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 
 ## Activity State
 
-Retrieve Context easily (by default activity is created())
+Set initial activity state (by default activity is created())
 
 ```java
 @RunWith(CustomTestRunner.class)
@@ -108,7 +109,7 @@ verify(context, times(2)).someMethod(anyInt());
 public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RView View view;
+    @RView CustomView customView;
     
     @Test
     public void testDisplayUser() throws Exception {
@@ -117,7 +118,7 @@ public class MyTest {
         // When
         mainView.display(user);
         // Then
-        verify(mainView).displayText("florent");
+        verify(customView).displayText("florent");
     }
 }
 ```
@@ -148,7 +149,7 @@ Author: Florent Champigny [http://www.florentchampigny.com/](http://www.florentc
   <img alt="Follow me on Twitter"
        src="https://raw.githubusercontent.com/florent37/DaVinci/master/mobile/src/main/res/drawable-hdpi/twitter.png" />
 </a>
-<a href="https://www.linkedin.com/profile/view?id=297860624">
+<a href="https://fr.linkedin.com/in/florentchampigny">
   <img alt="Follow me on LinkedIn"
        src="https://raw.githubusercontent.com/florent37/DaVinci/master/mobile/src/main/res/drawable-hdpi/linkedin.png" />
 </a>
