@@ -40,7 +40,7 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 }
 ```
 
-## Activity State
+## Activity
 
 Set initial activity state (by default activity is created())
 
@@ -124,6 +124,53 @@ public class MyTest {
 ```
 
 Note that the injected view is a spy !
+
+## Fragment
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RFragment MyFragment myFragment;
+    
+    @Test
+    public void testDisplayUser() throws Exception {
+        // Given
+        given(user.getName()).willReturn("florent");
+        // When
+        myFragment.display(user);
+        // Then
+        verify(myFragment).displayText("florent");
+    }
+}
+```
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RFragment(
+        attached = true/false,
+        tag = "fragmentTag"
+    )
+    MyFragment myFragment;
+    
+    @Test
+    public void testDisplayUser() throws Exception {
+        // Given
+        androidUnitTest.fragment().addToActivity(myFragment)
+        
+        // When
+        
+        // Then
+
+    }
+}
+```
+
+Note that the injected fragment is a spy !
 
 # Download
 
