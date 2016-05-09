@@ -1,6 +1,6 @@
 # Android Unit Test
 
-Elegant Unit test for Android ! 
+Save time & clear your unit tests on Android ! 
 Use annotations to inject Context, Activities, Fragments and Views into your tests
 
 #Usage
@@ -108,7 +108,7 @@ verify(context, times(2)).someMethod(anyInt());
 public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RView View view;
+    @RView CustomView customView;
     
     @Test
     public void testDisplayUser() throws Exception {
@@ -117,7 +117,7 @@ public class MyTest {
         // When
         mainView.display(user);
         // Then
-        verify(mainView).displayText("florent");
+        verify(customView).displayText("florent");
     }
 }
 ```
