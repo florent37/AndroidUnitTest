@@ -42,7 +42,7 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 
 ## Activity State
 
-Retrieve Context easily (by default activity is created())
+Set initial activity state (by default activity is created())
 
 ```java
 @RunWith(CustomTestRunner.class)
