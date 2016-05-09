@@ -1,6 +1,8 @@
 package com.github.florent37.androidunittest;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,6 +14,7 @@ import com.github.florent37.androidunittest.annotations.RFragment;
 import com.github.florent37.androidunittest.annotations.RView;
 
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.FieldReader;
 import org.mockito.internal.util.reflection.FieldSetter;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
@@ -28,7 +31,7 @@ public class AndroidUnitTestAnnotations {
     final AndroidUnitTest androidUnitTest;
     Object target;
     Field activityField;
-    Set<Field> fragmentField;
+    Set<Field> fragmentsField;
     Field contextField;
     Set<Field> viewsField;
 
@@ -37,7 +40,7 @@ public class AndroidUnitTestAnnotations {
     public AndroidUnitTestAnnotations(AndroidUnitTest androidUnitTest) {
         this.androidUnitTest = androidUnitTest;
 
-        this.fragmentField = new HashSet<>();
+        this.fragmentsField = new HashSet<>();
         this.viewsField = new HashSet<>();
     }
 
@@ -96,9 +99,7 @@ public class AndroidUnitTestAnnotations {
                 if (tag == null || tag.isEmpty()) {
                     tag = fragment.getClass().toString();
                 }
-                getActivity().getSupportFragmentManager().beginTransaction()
-                    .add(fragment, tag)
-                    .commit();
+                addToActivity(getActivity(), fragment, tag);
             }
         }
     }
@@ -110,7 +111,7 @@ public class AndroidUnitTestAnnotations {
     private void execute() {
         initContext();
         initActivity();
-        for (Field fragment : fragmentField) {
+        for (Field fragment : fragmentsField) {
             initFragment(fragment);
         }
         for (Field view : viewsField) {
@@ -136,7 +137,7 @@ public class AndroidUnitTestAnnotations {
                 activityField = field;
             }
             if (field.isAnnotationPresent(RFragment.class)) {
-                fragmentField.add(field);
+                fragmentsField.add(field);
             }
             if (field.isAnnotationPresent(RContext.class)) {
                 contextField = field;
@@ -175,5 +176,36 @@ public class AndroidUnitTestAnnotations {
         if (this.activityField != null) {
             new FieldSetter(target, this.activityField).set(fragmentActivity);
         }
+    }
+
+    public void addToActivity(@NonNull Fragment fragment){
+        String tag = null;
+        for(Field fragmentField : fragmentsField){
+            Fragment fragmentOfField = (Fragment) new FieldReader(target, fragmentField).read();
+            if(fragment == fragmentOfField){
+                RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
+                tag = fragmentAnnotation.tag();
+            }
+        }
+        if (tag == null || tag.isEmpty()) {
+            tag = fragment.getClass().toString();
+        }
+        addToActivity(getActivity(), fragment, tag);
+    }
+
+    public void removeFromActivity(Fragment fragment){
+        removeFromActivity(getActivity(), fragment);
+    }
+
+    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag){
+        activity.getSupportFragmentManager().beginTransaction()
+            .add(fragment, tag)
+            .commit();
+    }
+
+    public static void removeFromActivity(FragmentActivity activity, Fragment fragment){
+        activity.getSupportFragmentManager().beginTransaction()
+            .remove(fragment)
+            .commit();
     }
 }

@@ -2,7 +2,8 @@ package com.github.florent37.androidunittest;
 
 import android.support.annotation.Nullable;
 
-import com.github.florent37.androidunittest.activity.Controller;
+import com.github.florent37.androidunittest.activity.ControllerActivity;
+import com.github.florent37.androidunittest.fragment.ControllerFragment;
 
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -20,13 +21,15 @@ public class AndroidUnitTest implements MethodRule {
         return new AndroidUnitTest();
     }
 
-    Controller controller;
+    ControllerActivity controllerActivity;
+    ControllerFragment controllerFragment;
     @Nullable  ActivityController activityController;
     private AndroidUnitTestAnnotations androidUnitTestAnnotations;
 
     protected AndroidUnitTest() {
         androidUnitTestAnnotations = new AndroidUnitTestAnnotations(AndroidUnitTest.this);
-        controller = new Controller(this);
+        controllerActivity = new ControllerActivity(this);
+        controllerFragment = new ControllerFragment(this);
     }
 
     @Override
@@ -55,7 +58,11 @@ public class AndroidUnitTest implements MethodRule {
         this.activityController = activityController;
     }
 
-    public Controller activity(){
-        return controller;
+    public ControllerActivity activity(){
+        return controllerActivity;
+    }
+
+    public ControllerFragment fragment(){
+        return controllerFragment;
     }
 }

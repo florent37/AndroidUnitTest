@@ -8,9 +8,10 @@ import com.github.florent37.androidunittest.AndroidUnitTest;
 /**
  * Created by florentchampigny on 08/05/2016.
  */
-public class Controller {
+public class ControllerActivity {
+
     private AndroidUnitTest androidUnitTest;
-    public Controller(AndroidUnitTest androidUnitTest) {
+    public ControllerActivity(AndroidUnitTest androidUnitTest) {
         this.androidUnitTest = androidUnitTest;
     }
 
@@ -23,7 +24,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller resume(){
+    public ControllerActivity resume(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().resume();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
@@ -32,7 +33,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller create(){
+    public ControllerActivity create(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().create();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
@@ -41,7 +42,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller start(){
+    public ControllerActivity start(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().start();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
@@ -50,7 +51,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller pause(){
+    public ControllerActivity pause(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().pause();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
@@ -59,7 +60,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller stop(){
+    public ControllerActivity stop(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().stop();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
@@ -68,7 +69,7 @@ public class Controller {
     }
 
     @Nullable
-    public Controller destroy(){
+    public ControllerActivity destroy(){
         if(androidUnitTest.getActivityController() != null) {
             androidUnitTest.getActivityController().destroy();
             androidUnitTest.getAndroidUnitTestAnnotations().updateActivity();
