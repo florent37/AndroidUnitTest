@@ -11,8 +11,9 @@ Use annotations to inject Context, Activities, Fragments and Views into your tes
 public class MainActivityTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RActivity MainActivity activity;
-    @Mock User user;
+    @RContect Context context; //inject the app context
+    @RActivity MainActivity activity; //generates the tested activity
+    @Mock User user; //mock an user
 
     @Test
     public void testDisplayUser() throws Exception {
