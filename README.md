@@ -59,20 +59,10 @@ public class MyTest {
         destroyed = true / false
         )
     MainActivity activity;
-
-}
-```
-
-```java
-@RunWith(CustomTestRunner.class)
-public class MyTest {
-    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
-
-    @RActivity MainActivity activity;
     
     @Test
     public void testMyFunction(){
-        androidUnitTest.activity().resume();
+         androidUnitTest.activity().resume();
     }
 
 }
@@ -116,8 +106,10 @@ public class MyTest {
     public void testDisplayUser() throws Exception {
         // Given
         given(user.getName()).willReturn("florent");
+        
         // When
         mainView.display(user);
+        
         // Then
         verify(customView).displayText("florent");
     }
@@ -140,8 +132,10 @@ public class MyTest {
     public void testDisplayUser() throws Exception {
         // Given
         given(user.getName()).willReturn("florent");
+        
         // When
         myFragment.display(user);
+        
         // Then
         verify(myFragment).displayText("florent");
     }
@@ -158,16 +152,10 @@ public class MyTest {
         tag = "fragmentTag"
     )
     MyFragment myFragment;
-    
+        
     @Test
-    public void testDisplayUser() throws Exception {
-        // Given
+    public void testMyFunction() throws Exception {
         androidUnitTest.fragment().addToActivity(myFragment)
-        
-        // When
-        
-        // Then
-
     }
 }
 ```
