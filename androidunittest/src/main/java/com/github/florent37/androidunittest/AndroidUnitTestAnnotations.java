@@ -150,23 +150,25 @@ public class AndroidUnitTestAnnotations {
     private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
         if(activityAnnotation != null) {
-            if (activityAnnotation.created()) {
-                activityController.create();
-            }
-            if (activityAnnotation.started()) {
-                activityController.start();
-            }
-            if (activityAnnotation.resumed()) {
-                activityController.resume();
-            }
-            if (activityAnnotation.paused()) {
-                activityController.pause();
-            }
-            if (activityAnnotation.stoped()) {
-                activityController.stop();
-            }
-            if (activityAnnotation.destroyed()) {
-                activityController.destroy();
+            switch(activityAnnotation.type()){
+                case CREATED:
+                    activityController.create();
+                    break;
+                case STARTED:
+                    activityController.start();
+                    break;
+                case RESUMED:
+                    activityController.restart();
+                    break;
+                case PAUSED:
+                    activityController.pause();
+                    break;
+                case STOPPED:
+                    activityController.stop();
+                    break;
+                case DESTROYED:
+                    activityController.destroy();
+                    break;
             }
         }
         androidUnitTest.setActivityController(activityController);
