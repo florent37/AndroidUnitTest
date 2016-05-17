@@ -215,18 +215,4 @@ public class AndroidUnitTestAnnotations {
             new FieldSetter(target, this.activityField).set(fragmentActivity);
         }
     }
-
-    private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
-        ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        if (activityAnnotation != null) {
-            ActivityState activityState = activityAnnotation.state();
-            setActivityState(activityController, activityState);
-        }
-        androidUnitTest.setActivityController(activityController);
-        FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
-        fragmentActivity = Mockito.spy(fragmentActivity);
-        if (this.activityField != null) {
-            new FieldSetter(target, this.activityField).set(fragmentActivity);
-        }
-    }
 }
