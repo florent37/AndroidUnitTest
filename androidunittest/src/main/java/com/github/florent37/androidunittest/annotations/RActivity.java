@@ -1,5 +1,7 @@
 package com.github.florent37.androidunittest.annotations;
 
+import com.github.florent37.androidunittest.states.SActivity;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -8,10 +10,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RActivity {
-    boolean created() default true;
-    boolean started() default false;
-    boolean resumed() default false;
-    boolean paused() default false;
-    boolean stoped() default false;
-    boolean destroyed() default false;
+    SActivity type() default SActivity.CREATED;
 }
