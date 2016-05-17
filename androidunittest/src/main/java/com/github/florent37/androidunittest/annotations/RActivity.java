@@ -10,5 +10,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RActivity {
-    SActivity type() default SActivity.CREATED;
+    SActivity state() default SActivity.CREATED;
 }

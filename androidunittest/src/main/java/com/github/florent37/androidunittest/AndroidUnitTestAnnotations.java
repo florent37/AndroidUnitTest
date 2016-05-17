@@ -1,6 +1,5 @@
 package com.github.florent37.androidunittest;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,6 +41,18 @@ public class AndroidUnitTestAnnotations {
 
         this.fragmentsField = new HashSet<>();
         this.viewsField = new HashSet<>();
+    }
+
+    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag) {
+        activity.getSupportFragmentManager().beginTransaction()
+            .add(fragment, tag)
+            .commit();
+    }
+
+    public static void removeFromActivity(FragmentActivity activity, Fragment fragment) {
+        activity.getSupportFragmentManager().beginTransaction()
+            .remove(fragment)
+            .commit();
     }
 
     public AndroidUnitTestAnnotations init(Object target) {
@@ -104,6 +115,25 @@ public class AndroidUnitTestAnnotations {
         }
     }
 
+    public void addToActivity(@NonNull Fragment fragment) {
+        String tag = null;
+        for (Field fragmentField : fragmentsField) {
+            Fragment fragmentOfField = (Fragment) new FieldReader(target, fragmentField).read();
+            if (fragment == fragmentOfField) {
+                RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
+                tag = fragmentAnnotation.tag();
+            }
+        }
+        if (tag == null || tag.isEmpty()) {
+            tag = fragment.getClass().toString();
+        }
+        addToActivity(getActivity(), fragment, tag);
+    }
+
+    public void removeFromActivity(Fragment fragment) {
+        removeFromActivity(getActivity(), fragment);
+    }
+
     private FragmentActivity getActivity() {
         return (FragmentActivity) androidUnitTest.getActivityController().get();
     }
@@ -150,25 +180,20 @@ public class AndroidUnitTestAnnotations {
 
     private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        if(activityAnnotation != null) {
-            switch(activityAnnotation.type()){
-                case CREATED:
-                    activityController.create();
-                    break;
-                case STARTED:
-                    activityController.start();
-                    break;
-                case RESUMED:
-                    activityController.restart();
-                    break;
-                case PAUSED:
-                    activityController.pause();
-                    break;
-                case STOPPED:
-                    activityController.stop();
-                    break;
+        if (activityAnnotation != null) {
+            switch (activityAnnotation.state()) {
                 case DESTROYED:
                     activityController.destroy();
+                case STOPPED:
+                    activityController.stop();
+                case PAUSED:
+                    activityController.pause();
+                case RESUMED:
+                    activityController.restart();
+                case STARTED:
+                    activityController.start();
+                case CREATED:
+                    activityController.create();
                     break;
             }
         }
@@ -178,36 +203,5 @@ public class AndroidUnitTestAnnotations {
         if (this.activityField != null) {
             new FieldSetter(target, this.activityField).set(fragmentActivity);
         }
-    }
-
-    public void addToActivity(@NonNull Fragment fragment){
-        String tag = null;
-        for(Field fragmentField : fragmentsField){
-            Fragment fragmentOfField = (Fragment) new FieldReader(target, fragmentField).read();
-            if(fragment == fragmentOfField){
-                RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
-                tag = fragmentAnnotation.tag();
-            }
-        }
-        if (tag == null || tag.isEmpty()) {
-            tag = fragment.getClass().toString();
-        }
-        addToActivity(getActivity(), fragment, tag);
-    }
-
-    public void removeFromActivity(Fragment fragment){
-        removeFromActivity(getActivity(), fragment);
-    }
-
-    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag){
-        activity.getSupportFragmentManager().beginTransaction()
-            .add(fragment, tag)
-            .commit();
-    }
-
-    public static void removeFromActivity(FragmentActivity activity, Fragment fragment){
-        activity.getSupportFragmentManager().beginTransaction()
-            .remove(fragment)
-            .commit();
     }
 }
