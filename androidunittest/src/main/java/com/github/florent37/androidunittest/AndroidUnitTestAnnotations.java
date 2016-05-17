@@ -11,6 +11,8 @@ import com.github.florent37.androidunittest.annotations.RActivity;
 import com.github.florent37.androidunittest.annotations.RContext;
 import com.github.florent37.androidunittest.annotations.RFragment;
 import com.github.florent37.androidunittest.annotations.RView;
+import com.github.florent37.androidunittest.states.ActivityState;
+import com.github.florent37.androidunittest.states.ActivityStateIndex;
 
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldReader;
@@ -134,6 +136,28 @@ public class AndroidUnitTestAnnotations {
         removeFromActivity(getActivity(), fragment);
     }
 
+    public void setActivityState(ActivityController activityController, ActivityState activityState) {
+        int stateIndex = activityState.getActivityLifecycleIndex();
+        if (stateIndex >= ActivityStateIndex.INDEX_CREATED) {
+            activityController.create();
+        }
+        if (stateIndex >= ActivityStateIndex.INDEX_STARTED) {
+            activityController.start();
+        }
+        if (stateIndex >= ActivityStateIndex.INDEX_RESUMED) {
+            activityController.resume();
+        }
+        if (stateIndex >= ActivityStateIndex.INDEX_PAUSED) {
+            activityController.pause();
+        }
+        if (stateIndex >= ActivityStateIndex.INDEX_STOPPED) {
+            activityController.stop();
+        }
+        if (stateIndex >= ActivityStateIndex.INDEX_DESTROYED) {
+            activityController.destroy();
+        }
+    }
+
     private FragmentActivity getActivity() {
         return (FragmentActivity) androidUnitTest.getActivityController().get();
     }
@@ -181,21 +205,22 @@ public class AndroidUnitTestAnnotations {
     private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
         if (activityAnnotation != null) {
-            switch (activityAnnotation.state()) {
-                case DESTROYED:
-                    activityController.destroy();
-                case STOPPED:
-                    activityController.stop();
-                case PAUSED:
-                    activityController.pause();
-                case RESUMED:
-                    activityController.restart();
-                case STARTED:
-                    activityController.start();
-                case CREATED:
-                    activityController.create();
-                    break;
-            }
+            ActivityState activityState = activityAnnotation.state();
+            setActivityState(activityController, activityState);
+        }
+        androidUnitTest.setActivityController(activityController);
+        FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
+        fragmentActivity = Mockito.spy(fragmentActivity);
+        if (this.activityField != null) {
+            new FieldSetter(target, this.activityField).set(fragmentActivity);
+        }
+    }
+
+    private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
+        ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
+        if (activityAnnotation != null) {
+            ActivityState activityState = activityAnnotation.state();
+            setActivityState(activityController, activityState);
         }
         androidUnitTest.setActivityController(activityController);
         FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
