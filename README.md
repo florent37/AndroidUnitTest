@@ -50,7 +50,7 @@ Set initial activity state (by default activity is created())
 public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RActivity(state = CREATED / STARTED / RESUMED / PAUSED / STOPPED / DESTRPYED)
+    @RActivity(state = CREATED / STARTED / RESUMED / PAUSED / STOPPED / DESTROYED)
     MainActivity activity;
     
     @Test
