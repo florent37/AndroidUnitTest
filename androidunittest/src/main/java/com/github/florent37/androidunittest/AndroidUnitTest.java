@@ -17,19 +17,18 @@ import org.robolectric.util.ActivityController;
  */
 public class AndroidUnitTest implements MethodRule {
 
-    public static AndroidUnitTest rule() {
-        return new AndroidUnitTest();
-    }
-
     ControllerActivity controllerActivity;
     ControllerFragment controllerFragment;
-    @Nullable  ActivityController activityController;
+    @Nullable ActivityController activityController;
     private AndroidUnitTestAnnotations androidUnitTestAnnotations;
-
     protected AndroidUnitTest() {
         androidUnitTestAnnotations = new AndroidUnitTestAnnotations(AndroidUnitTest.this);
         controllerActivity = new ControllerActivity(this);
         controllerFragment = new ControllerFragment(this);
+    }
+
+    public static AndroidUnitTest rule() {
+        return new AndroidUnitTest();
     }
 
     @Override
@@ -50,19 +49,20 @@ public class AndroidUnitTest implements MethodRule {
         return activityController;
     }
 
-    public AndroidUnitTestAnnotations getAndroidUnitTestAnnotations() {
-        return androidUnitTestAnnotations;
-    }
-
     public void setActivityController(@Nullable ActivityController activityController) {
         this.activityController = activityController;
     }
 
-    public ControllerActivity activity(){
+    public AndroidUnitTestAnnotations getAndroidUnitTestAnnotations() {
+        return androidUnitTestAnnotations;
+    }
+
+    public ControllerActivity activity() {
         return controllerActivity;
     }
 
-    public ControllerFragment fragment(){
+    public ControllerFragment fragment() {
         return controllerFragment;
     }
+
 }

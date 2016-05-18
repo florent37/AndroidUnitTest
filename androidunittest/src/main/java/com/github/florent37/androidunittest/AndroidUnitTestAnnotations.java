@@ -12,7 +12,6 @@ import com.github.florent37.androidunittest.annotations.RContext;
 import com.github.florent37.androidunittest.annotations.RFragment;
 import com.github.florent37.androidunittest.annotations.RView;
 import com.github.florent37.androidunittest.states.ActivityState;
-import com.github.florent37.androidunittest.states.ActivityStateIndex;
 
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldReader;
@@ -104,7 +103,7 @@ public class AndroidUnitTestAnnotations {
 
             if (this.activityField == null) {
                 createActivity(FragmentActivity.class, null);
-                androidUnitTest.getActivityController().create();
+                androidUnitTest.activity().setActivityState(ActivityState.CREATED);
             }
 
             if (fragmentAnnotation.attached()) {
@@ -134,28 +133,6 @@ public class AndroidUnitTestAnnotations {
 
     public void removeFromActivity(Fragment fragment) {
         removeFromActivity(getActivity(), fragment);
-    }
-
-    public void setActivityState(ActivityController activityController, ActivityState activityState) {
-        int stateIndex = activityState.getActivityLifecycleIndex();
-        if (stateIndex >= ActivityStateIndex.INDEX_CREATED) {
-            activityController.create();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_STARTED) {
-            activityController.start();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_RESUMED) {
-            activityController.resume();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_PAUSED) {
-            activityController.pause();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_STOPPED) {
-            activityController.stop();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_DESTROYED) {
-            activityController.destroy();
-        }
     }
 
     private FragmentActivity getActivity() {
@@ -204,11 +181,11 @@ public class AndroidUnitTestAnnotations {
 
     private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
+        androidUnitTest.setActivityController(activityController);
         if (activityAnnotation != null) {
             ActivityState activityState = activityAnnotation.state();
-            setActivityState(activityController, activityState);
+            androidUnitTest.activity().setActivityState(activityController, activityState);
         }
-        androidUnitTest.setActivityController(activityController);
         FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
         fragmentActivity = Mockito.spy(fragmentActivity);
         if (this.activityField != null) {
