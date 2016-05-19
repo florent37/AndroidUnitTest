@@ -2,8 +2,8 @@ package com.github.florent37.androidunittest;
 
 import android.support.annotation.Nullable;
 
-import com.github.florent37.androidunittest.activity.ControllerActivity;
-import com.github.florent37.androidunittest.fragment.ControllerFragment;
+import com.github.florent37.androidunittest.controllers.ControllerActivity;
+import com.github.florent37.androidunittest.controllers.ControllerFragment;
 
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;

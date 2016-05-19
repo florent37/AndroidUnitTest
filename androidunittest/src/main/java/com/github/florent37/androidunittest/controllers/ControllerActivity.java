@@ -1,4 +1,4 @@
-package com.github.florent37.androidunittest.activity;
+package com.github.florent37.androidunittest.controllers;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
