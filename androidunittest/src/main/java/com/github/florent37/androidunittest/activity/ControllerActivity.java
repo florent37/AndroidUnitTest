@@ -5,7 +5,6 @@ import android.support.v4.app.FragmentActivity;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.states.ActivityState;
-import com.github.florent37.androidunittest.states.ActivityStateIndex;
 
 import org.robolectric.util.ActivityController;
 
@@ -92,25 +91,40 @@ public class ControllerActivity {
     }
 
     public ControllerActivity setActivityState(ActivityController activityController, ActivityState activityState) {
-        int stateIndex = activityState.getActivityLifecycleIndex();
-        if (stateIndex >= ActivityStateIndex.INDEX_CREATED) {
-            activityController.create();
+        ActivityState init = ActivityState.CREATED;
+
+        while (init != null && init.isLowerOrEquals(activityState)) {
+            System.out.println(init);
+            applyState(init, activityController);
+            init = init.next();
         }
-        if (stateIndex >= ActivityStateIndex.INDEX_STARTED) {
-            activityController.start();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_RESUMED) {
-            activityController.resume();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_PAUSED) {
-            activityController.pause();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_STOPPED) {
-            activityController.stop();
-        }
-        if (stateIndex >= ActivityStateIndex.INDEX_DESTROYED) {
-            activityController.destroy();
-        }
+
         return this;
     }
+
+    private void applyState(ActivityState state,
+                            ActivityController controller) {
+        switch (state) {
+            case STARTED:
+                controller.start();
+                break;
+            case RESUMED:
+                controller.resume();
+                break;
+            case PAUSED:
+                controller.pause();
+                break;
+            case STOPPED:
+                controller.stop();
+                break;
+            case DESTROYED:
+                controller.destroy();
+                break;
+            case CREATED:
+            default:
+                controller.create();
+                break;
+        }
+    }
+
 }

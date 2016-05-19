@@ -2,194 +2,102 @@ package com.github.florent37.androidunittest;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.view.View;
 
-import com.github.florent37.androidunittest.annotations.RActivity;
-import com.github.florent37.androidunittest.annotations.RContext;
-import com.github.florent37.androidunittest.annotations.RFragment;
-import com.github.florent37.androidunittest.annotations.RView;
-import com.github.florent37.androidunittest.states.ActivityState;
+import com.github.florent37.androidunittest.managers.AbstractAnnotationManager;
+import com.github.florent37.androidunittest.managers.AnnotationActivityManager;
+import com.github.florent37.androidunittest.managers.AnnotationContextManager;
+import com.github.florent37.androidunittest.managers.AnnotationFragmentManager;
+import com.github.florent37.androidunittest.managers.AnnotationViewManager;
 
-import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.FieldReader;
-import org.mockito.internal.util.reflection.FieldSetter;
-import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.util.ActivityController;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by florentchampigny on 07/05/2016.
  */
 public class AndroidUnitTestAnnotations {
-    final AndroidUnitTest androidUnitTest;
-    Object target;
-    Field activityField;
-    Set<Field> fragmentsField;
-    Field contextField;
-    Set<Field> viewsField;
+    final Context context;
 
-    Context context = RuntimeEnvironment.application;
+    AndroidUnitTest androidUnitTest;
+    Object target;
+
+    AbstractAnnotationManager managers[];
+    AnnotationActivityManager activityManager;
+    AnnotationFragmentManager fragmentManager;
+
+
+    private AndroidUnitTestAnnotations() {
+        context = RuntimeEnvironment.application;
+    }
 
     public AndroidUnitTestAnnotations(AndroidUnitTest androidUnitTest) {
+        this();
+
         this.androidUnitTest = androidUnitTest;
-
-        this.fragmentsField = new HashSet<>();
-        this.viewsField = new HashSet<>();
     }
 
-    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag) {
-        activity.getSupportFragmentManager().beginTransaction()
-            .add(fragment, tag)
-            .commit();
-    }
-
-    public static void removeFromActivity(FragmentActivity activity, Fragment fragment) {
-        activity.getSupportFragmentManager().beginTransaction()
-            .remove(fragment)
-            .commit();
-    }
 
     public AndroidUnitTestAnnotations init(Object target) {
         //find @Activity
         //find @Fragment
         //find @RContext -> RuntimeEnvironment.application;
         this.target = target;
+
+        instantiate();
         scan();
         execute();
         return this;
     }
 
-    public void initContext() {
-        if (this.contextField != null) {
-            Context appContext = context;
-            appContext = Mockito.spy(appContext);
-            new FieldSetter(target, this.contextField).set(appContext);
-        }
-    }
-
-    public void initActivity() {
-        if (this.activityField != null) {
-            Class activityClass = this.activityField.getType();
-            RActivity activityAnnotation = this.activityField.getAnnotation(RActivity.class);
-            createActivity(activityClass, activityAnnotation);
-        }
-    }
 
     public void updateActivity() {
-        new FieldSetter(target, this.activityField).set(androidUnitTest.getActivityController().get());
-    }
-
-    public void initFragment(Field fragmentField) {
-        if (fragmentField != null) {
-            RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
-
-            Class fragmentClass = fragmentField.getType();
-            Fragment fragment = null;
-            try {
-                fragment = (Fragment) fragmentClass.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            fragment = Mockito.spy(fragment);
-            new FieldSetter(target, fragmentField).set(fragment);
-
-            if (this.activityField == null) {
-                createActivity(FragmentActivity.class, null);
-                androidUnitTest.activity().setActivityState(ActivityState.CREATED);
-            }
-
-            if (fragmentAnnotation.attached()) {
-                String tag = fragmentAnnotation.tag();
-                if (tag == null || tag.isEmpty()) {
-                    tag = fragment.getClass().toString();
-                }
-                addToActivity(getActivity(), fragment, tag);
-            }
-        }
+        activityManager.updateActivity(target);
     }
 
     public void addToActivity(@NonNull Fragment fragment) {
-        String tag = null;
-        for (Field fragmentField : fragmentsField) {
-            Fragment fragmentOfField = (Fragment) new FieldReader(target, fragmentField).read();
-            if (fragment == fragmentOfField) {
-                RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
-                tag = fragmentAnnotation.tag();
-            }
-        }
-        if (tag == null || tag.isEmpty()) {
-            tag = fragment.getClass().toString();
-        }
-        addToActivity(getActivity(), fragment, tag);
+        fragmentManager.addToActivity(target, fragment);
     }
 
-    public void removeFromActivity(Fragment fragment) {
-        removeFromActivity(getActivity(), fragment);
+    public void removeFromActivity(@NonNull Fragment fragment) {
+        fragmentManager.removeFromActivity(fragment);
     }
 
-    private FragmentActivity getActivity() {
-        return (FragmentActivity) androidUnitTest.getActivityController().get();
+
+    /**
+     * Instantiate the list of abstract annotation managers
+     */
+    private void instantiate() {
+        managers = new AbstractAnnotationManager[]{
+                new AnnotationContextManager(androidUnitTest),
+                new AnnotationActivityManager(androidUnitTest),
+                new AnnotationFragmentManager(androidUnitTest),
+                new AnnotationViewManager(androidUnitTest)
+        };
+
+        activityManager = (AnnotationActivityManager) managers[1];
+        fragmentManager = (AnnotationFragmentManager) managers[2];
     }
 
-    private void execute() {
-        initContext();
-        initActivity();
-        for (Field fragment : fragmentsField) {
-            initFragment(fragment);
-        }
-        for (Field view : viewsField) {
-            initView(view);
-        }
-    }
-
-    private void initView(Field viewField) {
-        Class viewClass = viewField.getType();
-        View view = null;
-        try {
-            view = (View) viewClass.getDeclaredConstructor(Context.class).newInstance(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        view = Mockito.spy(view);
-        new FieldSetter(target, viewField).set(view);
-    }
-
+    /**
+     * Scan the target to populate the managers
+     */
     private void scan() {
         for (Field field : target.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(RActivity.class)) {
-                activityField = field;
-            }
-            if (field.isAnnotationPresent(RFragment.class)) {
-                fragmentsField.add(field);
-            }
-            if (field.isAnnotationPresent(RContext.class)) {
-                contextField = field;
-            }
-            if (field.isAnnotationPresent(RView.class)) {
-                viewsField.add(field);
-            }
+            for (AbstractAnnotationManager manager : managers)
+                if (manager.canManage(field))
+                    manager.scanned(field);
         }
     }
 
-    private void createActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
-        ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        androidUnitTest.setActivityController(activityController);
-        if (activityAnnotation != null) {
-            ActivityState activityState = activityAnnotation.state();
-            androidUnitTest.activity().setActivityState(activityController, activityState);
-        }
-        FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
-        fragmentActivity = Mockito.spy(fragmentActivity);
-        if (this.activityField != null) {
-            new FieldSetter(target, this.activityField).set(fragmentActivity);
-        }
+    /**
+     * Execute the different managers
+     *
+     * given their positions, it represents their dependencies
+     */
+    private void execute() {
+        for (AbstractAnnotationManager manager : managers)
+            manager.execute(target, context);
     }
 }
