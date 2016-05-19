@@ -14,6 +14,9 @@ public class ControllerFragment {
     }
 
     public ControllerFragment attachToActivity(Fragment fragment){
+        if (androidUnitTest.activity().get() == null) {
+
+        }
         androidUnitTest.getAndroidUnitTestAnnotations().addToActivity(fragment);
         return this;
     }

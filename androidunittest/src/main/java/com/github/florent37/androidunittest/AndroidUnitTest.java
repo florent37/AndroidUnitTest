@@ -21,6 +21,7 @@ public class AndroidUnitTest implements MethodRule {
     ControllerFragment controllerFragment;
     @Nullable ActivityController activityController;
     private AndroidUnitTestAnnotations androidUnitTestAnnotations;
+
     protected AndroidUnitTest() {
         androidUnitTestAnnotations = new AndroidUnitTestAnnotations(AndroidUnitTest.this);
         controllerActivity = new ControllerActivity(this);

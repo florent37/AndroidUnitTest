@@ -2,6 +2,7 @@ package com.github.florent37.androidunittest.managers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RContext;
@@ -17,16 +18,10 @@ import java.lang.reflect.Field;
  */
 public class AnnotationContextManager extends AbstractAnnotationManager {
 
-    private Field contextField;
+    @VisibleForTesting Field contextField;
 
     public AnnotationContextManager(AndroidUnitTest parent) {
         super(parent);
-    }
-
-    @NonNull
-    @Override
-    protected Class<? extends Annotation> canManagerInternal() {
-        return RContext.class;
     }
 
     @Override
@@ -41,5 +36,11 @@ public class AnnotationContextManager extends AbstractAnnotationManager {
             appContext = Mockito.spy(appContext);
             new FieldSetter(target, this.contextField).set(appContext);
         }
+    }
+
+    @NonNull
+    @Override
+    protected Class<? extends Annotation> canManagerInternal() {
+        return RContext.class;
     }
 }

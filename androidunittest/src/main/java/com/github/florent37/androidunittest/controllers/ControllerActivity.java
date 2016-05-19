@@ -1,11 +1,14 @@
 package com.github.florent37.androidunittest.controllers;
 
+import android.app.Activity;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
+import com.github.florent37.androidunittest.annotations.RActivity;
 import com.github.florent37.androidunittest.states.ActivityState;
 
+import org.mockito.Mockito;
+import org.robolectric.Robolectric;
 import org.robolectric.util.ActivityController;
 
 /**
@@ -20,9 +23,9 @@ public class ControllerActivity {
     }
 
     @Nullable
-    public FragmentActivity get() {
+    public Activity get() {
         if (androidUnitTest.getActivityController() != null) {
-            return (FragmentActivity) androidUnitTest.getActivityController().get();
+            return (Activity) androidUnitTest.getActivityController().get();
         }
         return null;
     }
@@ -33,6 +36,17 @@ public class ControllerActivity {
             return androidUnitTest.getActivityController();
         }
         return null;
+    }
+
+    public Activity createAndInitActivity(Class activityClass, @Nullable RActivity activityAnnotation) {
+        ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
+        androidUnitTest.setActivityController(activityController);
+        if (activityAnnotation != null) {
+            ActivityState activityState = activityAnnotation.state();
+            setActivityState(activityController, activityState);
+        }
+        Activity activity = (Activity) activityController.get();
+        return Mockito.spy(activity);
     }
 
     public ControllerActivity resume() {

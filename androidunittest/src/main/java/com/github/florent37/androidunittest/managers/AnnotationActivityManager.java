@@ -1,18 +1,15 @@
 package com.github.florent37.androidunittest.managers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.VisibleForTesting;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RActivity;
-import com.github.florent37.androidunittest.states.ActivityState;
 
-import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldSetter;
-import org.robolectric.Robolectric;
-import org.robolectric.util.ActivityController;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -22,28 +19,21 @@ import java.lang.reflect.Field;
  */
 public class AnnotationActivityManager extends AbstractAnnotationManager {
 
-    private Field activityField;
+    @VisibleForTesting Field activityField;
 
     public AnnotationActivityManager(AndroidUnitTest parent) {
         super(parent);
 
-        createAndInitActivity(null, FragmentActivity.class, null);
-        parent.activity().setActivityState(ActivityState.CREATED);
+        //createAndInitActivity(null, FragmentActivity.class, null);
+        //parent.activity().setActivityState(ActivityState.CREATED);
         //useless create() here since in createAndInitActivity
         //parent.getActivityController().create();
-    }
-
-    @NonNull
-    @Override
-    protected Class<? extends Annotation> canManagerInternal() {
-        return RActivity.class;
     }
 
     @Override
     public void scanned(@NonNull Field field) {
         activityField = field;
     }
-
 
     @Override
     public void execute(@NonNull Object object, @NonNull Context context) {
@@ -58,22 +48,21 @@ public class AnnotationActivityManager extends AbstractAnnotationManager {
         return activityField;
     }
 
-    private void createAndInitActivity(Object target, Class activityClass, @Nullable RActivity activityAnnotation) {
-        ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        getAndroidUnitTest().setActivityController(activityController);
-        if (activityAnnotation != null) {
-            ActivityState activityState = activityAnnotation.state();
-            getAndroidUnitTest().activity().setActivityState(activityController, activityState);
-        }
-        FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
-        fragmentActivity = Mockito.spy(fragmentActivity);
-        if (this.activityField != null) {
-            new FieldSetter(target, this.activityField).set(fragmentActivity);
+    public void createAndInitActivity(@Nullable Object target, Class activityClass, @Nullable RActivity activityAnnotation) {
+        Activity activity = getAndroidUnitTest().activity().createAndInitActivity(activityClass, activityAnnotation);
+        if (this.activityField != null && target != null) {
+            new FieldSetter(target, this.activityField).set(activity);
         }
     }
 
     public void updateActivity(Object target) {
         new FieldSetter(target, this.activityField)
                 .set(getAndroidUnitTest().getActivityController().get());
+    }
+
+    @NonNull
+    @Override
+    protected Class<? extends Annotation> canManagerInternal() {
+        return RActivity.class;
     }
 }

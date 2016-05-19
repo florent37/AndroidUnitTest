@@ -20,6 +20,7 @@ dependencies {
             'com.android.support:support-annotations:'+project.supportVersion,
             'com.android.support:appcompat-v7:'+project.supportVersion
     )
+    testCompile 'com.google.truth:truth:0.28'
 }
 
 

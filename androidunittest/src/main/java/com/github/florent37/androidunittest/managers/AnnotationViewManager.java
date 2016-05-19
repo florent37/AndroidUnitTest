@@ -2,6 +2,7 @@ package com.github.florent37.androidunittest.managers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.view.View;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
@@ -20,18 +21,12 @@ import java.util.Set;
  */
 public class AnnotationViewManager extends AbstractAnnotationManager {
 
-    private Set<Field> fields;
+    @VisibleForTesting Set<Field> fields;
 
     public AnnotationViewManager(AndroidUnitTest androidUnitTest) {
         super(androidUnitTest);
 
         fields = new HashSet<>();
-    }
-
-    @NonNull
-    @Override
-    protected Class<? extends Annotation> canManagerInternal() {
-        return RView.class;
     }
 
     @Override
@@ -40,17 +35,19 @@ public class AnnotationViewManager extends AbstractAnnotationManager {
     }
 
     @Override
-    public void execute(@NonNull Object object,
-                        @NonNull Context context) {
+    public void execute(@NonNull Object object, @NonNull Context context) {
         for (Field view : fields) {
             initView(object, context, view);
         }
     }
 
+    @NonNull
+    @Override
+    protected Class<? extends Annotation> canManagerInternal() {
+        return RView.class;
+    }
 
-    private void initView(@NonNull Object target,
-                          @NonNull Context context,
-                          @NonNull Field viewField) {
+    private void initView(@NonNull Object target, @NonNull Context context, @NonNull Field viewField) {
         Class viewClass = viewField.getType();
         View view = null;
         try {

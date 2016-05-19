@@ -1,5 +1,6 @@
 package com.github.florent37.androidunittest.managers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,8 @@ import android.support.v4.app.FragmentActivity;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RFragment;
+import com.github.florent37.androidunittest.controllers.ControllerActivity;
+import com.github.florent37.androidunittest.states.ActivityState;
 
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldReader;
@@ -28,10 +31,22 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
         fragmentFields = new HashSet<>();
     }
 
-    @NonNull
-    @Override
-    protected Class<? extends Annotation> canManagerInternal() {
-        return RFragment.class;
+    public static void addToActivity(Activity activity, Fragment fragment, String tag) {
+        if (activity instanceof FragmentActivity) {
+            FragmentActivity fragmentActivity = (FragmentActivity) activity;
+            fragmentActivity.getSupportFragmentManager().beginTransaction()
+                .add(fragment, tag)
+                .commit();
+        }
+    }
+
+    public static void removeFromActivity(Activity activity, Fragment fragment) {
+        if (activity instanceof FragmentActivity) {
+            FragmentActivity fragmentActivity = (FragmentActivity) activity;
+            fragmentActivity.getSupportFragmentManager().beginTransaction()
+                .remove(fragment)
+                .commit();
+        }
     }
 
     @Override
@@ -45,7 +60,6 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
             initFragment(object, fragment);
         }
     }
-
 
     public void initFragment(@NonNull Object target, @NonNull Field fragmentField) {
         RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
@@ -77,7 +91,6 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
         }
     }
 
-
     public void addToActivity(@NonNull Object target, Fragment fragment) {
         String tag = null;
         for (Field fragmentField : fragmentFields) {
@@ -90,26 +103,28 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
         if (tag == null || tag.isEmpty()) {
             tag = fragment.getClass().toString();
         }
+
+        ControllerActivity controllerActivity = getAndroidUnitTest().activity();
+        //if no activity is create, the default activity manager behaviour is to create one
+        if (controllerActivity.get() == null) {
+            controllerActivity.createAndInitActivity(FragmentActivity.class, null);
+            controllerActivity.setActivityState(ActivityState.CREATED);
+        }
+
         AnnotationFragmentManager.addToActivity(getActivity(), fragment, tag);
-    }
-
-    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag) {
-        activity.getSupportFragmentManager().beginTransaction()
-                .add(fragment, tag)
-                .commit();
-    }
-
-    public static void removeFromActivity(FragmentActivity activity, Fragment fragment) {
-        activity.getSupportFragmentManager().beginTransaction()
-                .remove(fragment)
-                .commit();
     }
 
     public void removeFromActivity(Fragment fragment) {
         AnnotationFragmentManager.removeFromActivity(getActivity(), fragment);
     }
 
-    private FragmentActivity getActivity() {
-        return (FragmentActivity) getAndroidUnitTest().getActivityController().get();
+    @NonNull
+    @Override
+    protected Class<? extends Annotation> canManagerInternal() {
+        return RFragment.class;
+    }
+
+    private Activity getActivity() {
+        return (Activity) getAndroidUnitTest().getActivityController().get();
     }
 }
