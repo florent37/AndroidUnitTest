@@ -3,6 +3,7 @@ package com.github.florent37.androidunittest.managers;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -23,7 +24,7 @@ import java.util.HashSet;
  * Created by kevinleperf on 18/05/16.
  */
 public class AnnotationFragmentManager extends AbstractAnnotationManager {
-    private final HashSet<Field> fragmentFields;
+    @VisibleForTesting final HashSet<Field> fragmentFields;
 
     public AnnotationFragmentManager(AndroidUnitTest parent) {
         super(parent);
@@ -125,6 +126,6 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
     }
 
     private Activity getActivity() {
-        return (Activity) getAndroidUnitTest().getActivityController().get();
+        return getAndroidUnitTest().activity().get();
     }
 }
