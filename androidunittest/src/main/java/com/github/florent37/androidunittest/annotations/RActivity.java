@@ -1,6 +1,6 @@
 package com.github.florent37.androidunittest.annotations;
 
-import com.github.florent37.androidunittest.states.SActivity;
+import com.github.florent37.androidunittest.states.ActivityState;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -10,5 +10,5 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RActivity {
-    SActivity type() default SActivity.CREATED;
+    ActivityState state() default ActivityState.CREATED;
 }

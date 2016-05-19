@@ -2,7 +2,6 @@ package com.github.florent37.androidunittest.managers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RContext;
@@ -36,9 +35,11 @@ public class AnnotationContextManager extends AbstractAnnotationManager {
     }
 
     @Override
-    public void execute(@NonNull Object object, @NonNull Context context) {
+    public void execute(@NonNull Object target, @NonNull Context context) {
         if (contextField != null) {
-            new FieldSetter(object, contextField).set(context);
+            Context appContext = context;
+            appContext = Mockito.spy(appContext);
+            new FieldSetter(target, this.contextField).set(appContext);
         }
     }
 }

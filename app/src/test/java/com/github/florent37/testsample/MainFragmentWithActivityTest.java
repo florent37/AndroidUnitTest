@@ -13,14 +13,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.spy;
 
 @RunWith(CustomTestRunner.class)
-public class MainFragmentTest {
+public class MainFragmentWithActivityTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
     @RContext Context context;
-    @RFragment(attached = false) MainFragment fragment;
+    @RActivity FragmentActivity fragmentActivity;
+    @RFragment(attached = false, tag = "monFragment") MainFragment fragment;
 
     @Test
     public void testAnnotations() throws Exception {
@@ -38,6 +38,7 @@ public class MainFragmentTest {
 
         // Then
         assertThat(fragment.getActivity()).isNotNull();
+        assertThat(fragmentActivity.getSupportFragmentManager().findFragmentByTag("monFragment")).isNotNull();
     }
 
 }

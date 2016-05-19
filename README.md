@@ -11,8 +11,9 @@ Use annotations to inject Context, Activities, Fragments and Views into your tes
 public class MainActivityTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RActivity MainActivity activity;
-    @Mock User user;
+    @RContect Context context; //inject the app context
+    @RActivity MainActivity activity; //generates the tested activity
+    @Mock User user; //mock an user
 
     @Test
     public void testDisplayUser() throws Exception {
@@ -40,7 +41,7 @@ public class CustomTestRunner extends AndroidUnitTestRunner {
 }
 ```
 
-## Activity State
+## Activity
 
 Set initial activity state (by default activity is created())
 
@@ -49,29 +50,12 @@ Set initial activity state (by default activity is created())
 public class MyTest {
     @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
 
-    @RActivity(
-        created = true / false,
-        started = true / false,
-        resumed = true / false,
-        paused = true / false,
-        stoped = true / false,
-        destroyed = true / false
-        )
+    @RActivity(state = CREATED / STARTED / RESUMED / PAUSED / STOPPED / DESTROYED)
     MainActivity activity;
-
-}
-```
-
-```java
-@RunWith(CustomTestRunner.class)
-public class MyTest {
-    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
-
-    @RActivity MainActivity activity;
     
     @Test
     public void testMyFunction(){
-        androidUnitTest.activity().resume();
+         androidUnitTest.activity().resume();
     }
 
 }
@@ -115,8 +99,10 @@ public class MyTest {
     public void testDisplayUser() throws Exception {
         // Given
         given(user.getName()).willReturn("florent");
+        
         // When
         mainView.display(user);
+        
         // Then
         verify(customView).displayText("florent");
     }
@@ -124,6 +110,50 @@ public class MyTest {
 ```
 
 Note that the injected view is a spy !
+
+## Fragment
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RFragment MyFragment myFragment;
+    @Mock User user;
+    
+    @Test
+    public void testDisplayUser() throws Exception {
+        // Given
+        given(user.getName()).willReturn("florent");
+        
+        // When
+        myFragment.display(user);
+        
+        // Then
+        verify(myFragment).displayText("florent");
+    }
+}
+```
+
+```java
+@RunWith(CustomTestRunner.class)
+public class MyTest {
+    @Rule public AndroidUnitTest androidUnitTest = AndroidUnitTest.rule();
+
+    @RFragment(
+        attached = true / false,
+        tag = "fragmentTag"
+    )
+    MyFragment myFragment;
+        
+    @Test
+    public void testMyFunction() throws Exception {
+        androidUnitTest.fragment().addToActivity(myFragment)
+    }
+}
+```
+
+Note that the injected fragment is a spy !
 
 # Download
 

@@ -48,17 +48,18 @@ public class AnnotationViewManager extends AbstractAnnotationManager {
     }
 
 
-    private void initView(Object target, Context context, Field viewField) {
+    private void initView(@NonNull Object target,
+                          @NonNull Context context,
+                          @NonNull Field viewField) {
         Class viewClass = viewField.getType();
         View view = null;
         try {
-            view = (View) viewClass
-                    .getDeclaredConstructor(Context.class)
-                    .newInstance(context);
+            view = (View) viewClass.getDeclaredConstructor(Context.class).newInstance(context);
         } catch (Exception e) {
             e.printStackTrace();
         }
         view = Mockito.spy(view);
         new FieldSetter(target, viewField).set(view);
     }
+
 }

@@ -1,7 +1,8 @@
 package com.github.florent37.androidunittest;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 
 import com.github.florent37.androidunittest.managers.AbstractAnnotationManager;
 import com.github.florent37.androidunittest.managers.AnnotationActivityManager;
@@ -9,8 +10,6 @@ import com.github.florent37.androidunittest.managers.AnnotationContextManager;
 import com.github.florent37.androidunittest.managers.AnnotationFragmentManager;
 import com.github.florent37.androidunittest.managers.AnnotationViewManager;
 
-import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.FieldSetter;
 import org.robolectric.RuntimeEnvironment;
 
 import java.lang.reflect.Field;
@@ -18,21 +17,19 @@ import java.lang.reflect.Field;
 /**
  * Created by florentchampigny on 07/05/2016.
  */
-public final class AndroidUnitTestAnnotations {
-    AndroidUnitTest androidUnitTest;
-
+public class AndroidUnitTestAnnotations {
     final Context context;
-    private Object target;
 
-    private AbstractAnnotationManager annotationManagers[];
-    private AnnotationActivityManager activityManager;
+    AndroidUnitTest androidUnitTest;
+    Object target;
+
+    AbstractAnnotationManager managers[];
+    AnnotationActivityManager activityManager;
+    AnnotationFragmentManager fragmentManager;
 
 
     private AndroidUnitTestAnnotations() {
-        androidUnitTest = null;
-
-        Context appContext = RuntimeEnvironment.application;
-        context = Mockito.spy(appContext);
+        context = RuntimeEnvironment.application;
     }
 
     public AndroidUnitTestAnnotations(AndroidUnitTest androidUnitTest) {
@@ -41,58 +38,66 @@ public final class AndroidUnitTestAnnotations {
         this.androidUnitTest = androidUnitTest;
     }
 
+
     public AndroidUnitTestAnnotations init(Object target) {
         //find @Activity
         //find @Fragment
         //find @RContext -> RuntimeEnvironment.application;
         this.target = target;
 
-        //since we are using a new target
-        //we must flush the previous instanciation
         instantiate();
         scan();
         execute();
-
         return this;
     }
 
+
     public void updateActivity() {
-        new FieldSetter(target, activityManager.getScanned())
-                .set(androidUnitTest.getActivityController().get());
+        activityManager.updateActivity(target);
     }
 
+    public void addToActivity(@NonNull Fragment fragment) {
+        fragmentManager.addToActivity(target, fragment);
+    }
+
+    public void removeFromActivity(@NonNull Fragment fragment) {
+        fragmentManager.removeFromActivity(fragment);
+    }
+
+
+    /**
+     * Instantiate the list of abstract annotation managers
+     */
     private void instantiate() {
-        annotationManagers = new AbstractAnnotationManager[]{
+        managers = new AbstractAnnotationManager[]{
                 new AnnotationContextManager(androidUnitTest),
                 new AnnotationActivityManager(androidUnitTest),
-                new AnnotationViewManager(androidUnitTest),
-                new AnnotationFragmentManager(androidUnitTest)
+                new AnnotationFragmentManager(androidUnitTest),
+                new AnnotationViewManager(androidUnitTest)
         };
 
-        //to make the update easier, we store a complete reference to it here
-        activityManager = null;
-        for (AbstractAnnotationManager manager : annotationManagers) {
-            if (manager instanceof AnnotationActivityManager)
-                activityManager = (AnnotationActivityManager) manager;
-        }
+        activityManager = (AnnotationActivityManager) managers[1];
+        fragmentManager = (AnnotationFragmentManager) managers[2];
     }
 
-    private void execute() {
-        for (AbstractAnnotationManager manager : annotationManagers)
-            manager.execute(target, context);
-    }
-
+    /**
+     * Scan the target to populate the managers
+     */
     private void scan() {
         for (Field field : target.getClass().getDeclaredFields()) {
-            for (AbstractAnnotationManager manager : annotationManagers) {
-                if (manager.canManage(field)) {
+            for (AbstractAnnotationManager manager : managers)
+                if (manager.canManage(field))
                     manager.scanned(field);
-                }
-            }
         }
     }
 
-    private FragmentActivity getActivity() {
-        return (FragmentActivity) androidUnitTest.getActivityController().get();
+    /**
+     * Execute the different managers
+     *
+     * given their positions, it represents their dependencies
+     */
+    private void execute() {
+        for (AbstractAnnotationManager manager : managers)
+            manager.execute(target, context);
     }
 }

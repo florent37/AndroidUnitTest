@@ -9,6 +9,7 @@ import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RFragment;
 
 import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.FieldReader;
 import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.lang.annotation.Annotation;
@@ -19,12 +20,12 @@ import java.util.HashSet;
  * Created by kevinleperf on 18/05/16.
  */
 public class AnnotationFragmentManager extends AbstractAnnotationManager {
-    private final HashSet<Field> fragmentField;
+    private final HashSet<Field> fragmentFields;
 
     public AnnotationFragmentManager(AndroidUnitTest parent) {
         super(parent);
 
-        fragmentField = new HashSet();
+        fragmentFields = new HashSet<>();
     }
 
     @NonNull
@@ -35,18 +36,18 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
 
     @Override
     public void scanned(@NonNull Field field) {
-        fragmentField.add(field);
+        fragmentFields.add(field);
     }
 
     @Override
     public void execute(@NonNull Object object, @NonNull Context context) {
-        for (Field fragment : fragmentField) {
+        for (Field fragment : fragmentFields) {
             initFragment(object, fragment);
         }
     }
 
 
-    public void initFragment(@NonNull Object object, @NonNull Field fragmentField) {
+    public void initFragment(@NonNull Object target, @NonNull Field fragmentField) {
         RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
 
         Class fragmentClass = fragmentField.getType();
@@ -55,26 +56,60 @@ public class AnnotationFragmentManager extends AbstractAnnotationManager {
             fragment = (Fragment) fragmentClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new IllegalStateException("Impossible to instantiate a fragment using the default constructor");
         }
 
         fragment = Mockito.spy(fragment);
-        new FieldSetter(object, fragmentField).set(fragment);
+        new FieldSetter(target, fragmentField).set(fragment);
 
-        //activity is never null since defined in ActivityManager controller
+        //if no activity is create, the default activity manager behaviour is to create one
+        /*if (this.activityField == null) {
+            createActivity(FragmentActivity.class, null);
+            androidUnitTest.activity().setActivityState(ActivityState.CREATED);
+        }*/
 
         if (fragmentAnnotation.attached()) {
             String tag = fragmentAnnotation.tag();
             if (tag == null || tag.isEmpty()) {
                 tag = fragment.getClass().toString();
             }
-            FragmentActivity activity = getAndroidUnitTest().activity().get();
-
-            if (activity != null) {
-                activity.getSupportFragmentManager().beginTransaction()
-                        .add(fragment, tag)
-                        .commit();
-            }
-
+            addToActivity(getActivity(), fragment, tag);
         }
+    }
+
+
+    public void addToActivity(@NonNull Object target, Fragment fragment) {
+        String tag = null;
+        for (Field fragmentField : fragmentFields) {
+            Fragment fragmentOfField = (Fragment) new FieldReader(target, fragmentField).read();
+            if (fragment == fragmentOfField) {
+                RFragment fragmentAnnotation = fragmentField.getAnnotation(RFragment.class);
+                tag = fragmentAnnotation.tag();
+            }
+        }
+        if (tag == null || tag.isEmpty()) {
+            tag = fragment.getClass().toString();
+        }
+        AnnotationFragmentManager.addToActivity(getActivity(), fragment, tag);
+    }
+
+    public static void addToActivity(FragmentActivity activity, Fragment fragment, String tag) {
+        activity.getSupportFragmentManager().beginTransaction()
+                .add(fragment, tag)
+                .commit();
+    }
+
+    public static void removeFromActivity(FragmentActivity activity, Fragment fragment) {
+        activity.getSupportFragmentManager().beginTransaction()
+                .remove(fragment)
+                .commit();
+    }
+
+    public void removeFromActivity(Fragment fragment) {
+        AnnotationFragmentManager.removeFromActivity(getActivity(), fragment);
+    }
+
+    private FragmentActivity getActivity() {
+        return (FragmentActivity) getAndroidUnitTest().getActivityController().get();
     }
 }

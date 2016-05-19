@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.github.florent37.androidunittest.AndroidUnitTest;
 import com.github.florent37.androidunittest.annotations.RActivity;
-import com.github.florent37.androidunittest.states.SActivity;
+import com.github.florent37.androidunittest.states.ActivityState;
 
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldSetter;
@@ -28,6 +28,7 @@ public class AnnotationActivityManager extends AbstractAnnotationManager {
         super(parent);
 
         createAndInitActivity(null, FragmentActivity.class, null);
+        parent.activity().setActivityState(ActivityState.CREATED);
         //useless create() here since in createAndInitActivity
         //parent.getActivityController().create();
     }
@@ -43,6 +44,7 @@ public class AnnotationActivityManager extends AbstractAnnotationManager {
         activityField = field;
     }
 
+
     @Override
     public void execute(@NonNull Object object, @NonNull Context context) {
         if (activityField != null) {
@@ -56,42 +58,22 @@ public class AnnotationActivityManager extends AbstractAnnotationManager {
         return activityField;
     }
 
-
     private void createAndInitActivity(Object target, Class activityClass, @Nullable RActivity activityAnnotation) {
         ActivityController activityController = ActivityController.of(Robolectric.getShadowsAdapter(), activityClass);
-        SActivity type = SActivity.CREATED;
-
-        if (activityAnnotation != null) {
-            type = activityAnnotation.type();
-        }
-
-        switch (type) {
-            case STARTED:
-                activityController.start();
-                break;
-            case RESUMED:
-                activityController.restart();
-                break;
-            case PAUSED:
-                activityController.pause();
-                break;
-            case STOPPED:
-                activityController.stop();
-                break;
-            case DESTROYED:
-                activityController.destroy();
-                break;
-            default:
-            case CREATED:
-                activityController.create();
-                break;
-        }
-        
         getAndroidUnitTest().setActivityController(activityController);
+        if (activityAnnotation != null) {
+            ActivityState activityState = activityAnnotation.state();
+            getAndroidUnitTest().activity().setActivityState(activityController, activityState);
+        }
         FragmentActivity fragmentActivity = (FragmentActivity) activityController.get();
         fragmentActivity = Mockito.spy(fragmentActivity);
-        if (this.activityField != null && target != null) {
+        if (this.activityField != null) {
             new FieldSetter(target, this.activityField).set(fragmentActivity);
         }
+    }
+
+    public void updateActivity(Object target) {
+        new FieldSetter(target, this.activityField)
+                .set(getAndroidUnitTest().getActivityController().get());
     }
 }
