@@ -4,7 +4,7 @@ Save time & clear your unit tests on Android !
 
 Use annotations to inject Context, Activities, Fragments and Views into your tests
 
-#Usage
+# Usage
 
 ```java
 @RunWith(CustomTestRunner.class)
@@ -167,7 +167,7 @@ testCompile 'org.mockito:mockito-core:1.10.19'
 testCompile 'org.robolectric:robolectric:3.0'
 ```
 
-#Credits
+# Credits
 
 Author: Florent Champigny [http://www.florentchampigny.com/](http://www.florentchampigny.com/)
 
