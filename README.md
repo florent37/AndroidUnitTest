@@ -4,8 +4,8 @@ Save time & clear your unit tests on Android !
 
 Use annotations to inject Context, Activities, Fragments and Views into your tests
 
-<a href="https://play.google.com/store/apps/details?id=com.github.florent37.florent.champigny">
-  <img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/iqkQGAc2EFNdScAzpwZr1Sdy/florent37/AndroidUnitTest'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/iqkQGAc2EFNdScAzpwZr1Sdy/florent37/AndroidUnitTest.svg' />
 </a>
 
 # Usage
