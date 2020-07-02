@@ -177,7 +177,7 @@ testCompile 'org.robolectric:robolectric:3.0'
 
 # Credits
 
-Author: Florent Champigny [http://www.florentchampigny.com/](http://www.florentchampigny.com/)
+Author: Florent Champigny 
 
 
 <a href="https://goo.gl/WXW8Dc">
